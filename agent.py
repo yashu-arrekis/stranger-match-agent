@@ -16,6 +16,12 @@ def reason_about_observation(observation):
     elif observation == "i'm a man":
         reasoning = "i'm a man means person is male"
         classification = "MALE"
+    elif "not" in observation and "woman" in observation:
+        reasoning = "not & woman refers as refuse to be a woman"
+        classification = "UNKNOWN"
+    elif "am" in observation and "woman" in observation:
+        reasoning = "am & woman refers to female"
+        classification = "FEMALE"
     else:
         reasoning = "unknown observation is encountered"
         classification = "UNKNOWN"
