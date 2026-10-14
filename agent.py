@@ -35,6 +35,9 @@ def reason_about_observation(observation):
     )
     output_data = json.loads(response.text)
     classification = output_data['classification']
+    if classification not in {"FEMALE", "MALE", "UNKNOWN"}:
+        classification = "UNKNOWN"
+        reasoning = "that the model returned an unsupported classification."
     reasoning = output_data['reasoning']
     return reasoning, classification
 
