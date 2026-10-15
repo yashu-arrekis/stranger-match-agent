@@ -1,5 +1,6 @@
 from google import genai
 import json
+from google.genai import errors
 
 client = genai.Client()
 
@@ -25,20 +26,36 @@ def reason_about_observation(observation):
         Return exactly the two requested JSON keys.
     - "reasoning": a brief sentence explaining your deduction based on clues in the observation.
     """
+    try:
+        response = client.models.generate_content(
+            model=type_of_model2,
+            contents=prompt,
+            config={
+                "response_mime_type": "application/json"
+            }
+        )
+    except errors.ClientError as e:
+        # Catches 400 (Bad Request), 403 (Forbidden), 429 (Rate Limits)
+        print(f"Fix your request or API Key. Details: {e}")
+        return "Gemini API request failed.", "UNKNOWN"
 
-    response = client.models.generate_content(
-        model=type_of_model2,
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json"
-        }
-    )
+    except errors.ServerError as e:
+        # Catches 500 (Internal Error), 503 (Service Unavailable)
+        print(f"Google's servers are having issues. Details: {e}")
+        return "Gemini API request failed.", "UNKNOWN"
+
+    except errors.APIError as e:
+        # Fallback that catches ANY Gemini API error
+        print(f"A general Gemini API error occurred: {e}")
+        return "Gemini API request failed.", "UNKNOWN"
+
     try:
         output_data = json.loads(response.text)
     except json.decoder.JSONDecodeError as invalid:
         print("encountered invalid json format")
         reasoning = "GEMINI returned invalid json"
         classification = "UNKNOWN"
+    
     classification = output_data.get("classification", "UNKNOWN")
     reasoning = output_data.get("reasoning", "reasoning is not provided.")
     if classification not in {"FEMALE", "MALE", "UNKNOWN"}:
