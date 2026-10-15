@@ -33,12 +33,17 @@ def reason_about_observation(observation):
             "response_mime_type": "application/json"
         }
     )
-    output_data = json.loads(response.text)
-    classification = output_data['classification']
+    try:
+        output_data = json.loads(response.text)
+    except json.decoder.JSONDecodeError as invalid:
+        print("encountered invalid json format")
+        reasoning = "GEMINI returned invalid json"
+        classification = "UNKNOWN"
+    classification = output_data.get("classification", "UNKNOWN")
+    reasoning = output_data.get("reasoning", "reasoning is not provided.")
     if classification not in {"FEMALE", "MALE", "UNKNOWN"}:
         classification = "UNKNOWN"
         reasoning = "that the model returned an unsupported classification."
-    reasoning = output_data['reasoning']
     return reasoning, classification
 
 def make_decision(classification):
