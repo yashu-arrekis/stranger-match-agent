@@ -40,6 +40,9 @@ def reason_about_observation(observation):
     """
     response = None
     for model_name in models_to_try:
+        if model_name == models_to_try[0]:
+            print(f"Simulating 429 error for {model_name}")
+            continue
         try:
             response = client.models.generate_content(
                 model=model_name,
@@ -56,8 +59,10 @@ def reason_about_observation(observation):
                 continue
             print(f"Non-retryable Gemini API error: {e}")
             return "Gemini API request failed.", "UNKNOWN"
+    print(model_name)
     if response is None:
         return "All gemini models failed.", "UNKNOWN"
+    
     try:
         output_data = json.loads(response.text)
     except json.decoder.JSONDecodeError as e:
