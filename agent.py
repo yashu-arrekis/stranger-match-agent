@@ -4,9 +4,21 @@ from google.genai import errors
 
 client = genai.Client()
 
-type_of_model = "gemini-3.6-flash"
-type_of_model1 = "gemini-3.8-flash"
-type_of_model2 = "gemini-3.5-flash-lite"
+type_of_model = "gemini-3.8-flash"
+type_of_model1 = "gemini-3.6-flash"
+type_of_model2 = "gemini-2.5-flash"
+type_of_model3 = "gemini-3.5-flash-lite"
+type_of_model4 = "gemini-3.1-flash-lite"
+type_of_model5 = "gemini-2.5-flash-lite"
+
+models_to_try=[
+    type_of_model,
+    type_of_model1,
+    type_of_model2,
+    type_of_model3,
+    type_of_model4,
+    type_of_model5
+]
 
 goal = "Determine whether the stranger is female"
 
@@ -26,35 +38,31 @@ def reason_about_observation(observation):
         Return exactly the two requested JSON keys.
     - "reasoning": a brief sentence explaining your deduction based on clues in the observation.
     """
-    try:
-        response = client.models.generate_content(
-            model=type_of_model2,
-            contents=prompt,
-            config={
-                "response_mime_type": "application/json"
-            }
-        )
-    except errors.ClientError as e:
-        # Catches 400 (Bad Request), 403 (Forbidden), 429 (Rate Limits)
-        print(f"Fix your request or API Key. Details: {e}")
-        return "Gemini API request failed.", "UNKNOWN"
+    response = None
+    for model_name in models_to_try:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json"
+                }
+            )
+            break
 
-    except errors.ServerError as e:
-        # Catches 500 (Internal Error), 503 (Service Unavailable)
-        print(f"Google's servers are having issues. Details: {e}")
-        return "Gemini API request failed.", "UNKNOWN"
-
-    except errors.APIError as e:
-        # Fallback that catches ANY Gemini API error
-        print(f"A general Gemini API error occurred: {e}")
-        return "Gemini API request failed.", "UNKNOWN"
-
+        except errors.APIError as e:
+            if e.code in (429, 500, 502, 503, 504):
+                print(f"Model {model_name} temporarily unavailable: {e}")
+                continue
+            print(f"Non-retryable Gemini API error: {e}")
+            return "Gemini API request failed.", "UNKNOWN"
+    if response is None:
+        return "All gemini models failed.", "UNKNOWN"
     try:
         output_data = json.loads(response.text)
-    except json.decoder.JSONDecodeError as invalid:
+    except json.decoder.JSONDecodeError as e:
         print("encountered invalid json format")
-        reasoning = "GEMINI returned invalid json"
-        classification = "UNKNOWN"
+        return "Gemini returned invalid Json.", "UNKNOWN"
     
     classification = output_data.get("classification", "UNKNOWN")
     reasoning = output_data.get("reasoning", "reasoning is not provided.")
