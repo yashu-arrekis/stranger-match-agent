@@ -87,9 +87,8 @@ def make_decision(classification):
     elif classification == "UNKNOWN":
         decision = "need more information"
     else:
-        decision = "skip"
+        decision = "need more information"
     return decision
-
 
 def take_action(decision):
     if decision == "skip":
@@ -98,9 +97,9 @@ def take_action(decision):
         action = "notify user"
     elif decision == "need more information":
         action = "ask for clarification"
+    else:
+        action = "ask for clarification"
     return action
-
-
 
 def run_agent(observation):
     reasoning, classification = reason_about_observation(observation)
