@@ -1,8 +1,10 @@
 from google import genai
 import json
 from google.genai import errors
-
+import sys
 client = genai.Client()
+
+available_models = [model.name.removeprefix("models/") for model in client.models.list()]
 
 type_of_model = "gemini-3.8-flash"
 type_of_model1 = "gemini-3.6-flash"
@@ -19,6 +21,10 @@ models_to_try=[
     type_of_model4,
     type_of_model5
 ]
+for model in models_to_try:
+    if model not in available_models:
+        print(f"{model} is invalid in models_to_try")
+        sys.exit()
 
 goal = "Determine whether the stranger is female"
 
@@ -40,9 +46,6 @@ def reason_about_observation(observation):
     """
     response = None
     for model_name in models_to_try:
-        if model_name == models_to_try[0]:
-            print(f"Simulating 429 error for {model_name}")
-            continue
         try:
             response = client.models.generate_content(
                 model=model_name,
