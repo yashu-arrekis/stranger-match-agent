@@ -128,6 +128,7 @@ def new_observation(observation):
         elif upd_result["action"] == "skip stranger":
             break
         else:
+            print(f"{upd_result['action']} this is an unexpected action to prevent program crash has to break loop")
             break
     return upd_result
 
