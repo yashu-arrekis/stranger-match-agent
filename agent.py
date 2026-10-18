@@ -2,6 +2,7 @@ from google import genai
 import json
 from google.genai import errors
 import sys
+
 client = genai.Client()
 
 available_models = [model.name.removeprefix("models/") for model in client.models.list()]
@@ -113,3 +114,22 @@ def run_agent(observation):
     }
 result = run_agent(observation)
 print(result)
+
+
+def new_observation(observation):
+    while True:
+        upd_result = run_agent(observation)
+        if upd_result["action"] == "ask for clarification":
+            print(upd_result)
+            observation = input("Enter your observation: ")
+            continue
+        elif upd_result["action"] == "notify user":
+            break
+        elif upd_result["action"] == "skip stranger":
+            break
+        else:
+            break
+    return upd_result
+
+result1 = new_observation("Hii how are you")
+print(result1)
