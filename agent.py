@@ -117,9 +117,19 @@ print(result)
 
 
 def new_observation(observation):
+    attempts = 0
+
     while True:
         upd_result = run_agent(observation)
         if upd_result["action"] == "ask for clarification":
+            
+            if attempts == 4:
+                upd_result["action"] = "clarification limit reached."
+                print(upd_result)
+                break
+            else:
+                attempts +=1
+
             print(upd_result)
             observation = input("Enter your observation: ")
             continue
@@ -132,5 +142,5 @@ def new_observation(observation):
             break
     return upd_result
 
-result1 = new_observation("Hii how are you")
-print(result1)
+result1 = new_observation("hello")
+
