@@ -123,7 +123,7 @@ def new_observation(observation):
         upd_result = run_agent(observation)
         if upd_result["action"] == "ask for clarification":
             
-            if attempts == 4:
+            if attempts == 3:
                 upd_result["action"] = "clarification limit reached."
                 print(upd_result)
                 break
@@ -145,7 +145,14 @@ def new_observation(observation):
 result1 = new_observation(observation)
 
 def reflect_on_result(result1):
-    return result1["classification"]
+    if result1["classification"] == "FEMALE":
+        return "result acceptable."
+    elif result1["classification"] == "MALE":
+        return "result acceptable."
+    elif result1["classification"] == "UNKNOWN":
+        return "clarification needed."
+    else:
+        return result1["classification"]
 
 data = reflect_on_result(result1)
 print(data)
