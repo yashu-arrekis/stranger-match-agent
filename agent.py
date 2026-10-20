@@ -122,16 +122,16 @@ def new_observation(observation):
     while True:
         upd_result = run_agent(observation)
         if upd_result["action"] == "ask for clarification":
-            
             if attempts == 3:
                 upd_result["action"] = "clarification limit reached."
                 print(upd_result)
                 break
             else:
                 attempts +=1
-
+            ref = reflect_on_result(upd_result)
             print(upd_result)
-            observation = input("Enter your observation: ")
+            if ref["classification"] == "clarification needed":
+                observation = input("Enter your observation: ")
             continue
         elif upd_result["action"] == "notify user":
             break
