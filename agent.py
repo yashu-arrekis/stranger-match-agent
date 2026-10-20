@@ -144,9 +144,8 @@ def new_observation(observation):
 
 result1 = new_observation(observation)
 
-def reflect_on_result(observation):
-    data = run_agent(observation)
+def reflect_on_result(result1):
+    return result1["classification"]
 
-    return data["classification"]
-data = reflect_on_result(observation)
+data = reflect_on_result(result1)
 print(data)
