@@ -165,3 +165,18 @@ test_dict ={
     "decision" : "match found",
     "action" : "notify user"
 }
+test_dict1 ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
+test_dict2 ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
+test_dict3 ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
