@@ -180,3 +180,13 @@ test_dict3 ={
     "decision" : "match found",
     "action" : "notify user"
 }
+test_dict4 ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
+test_dict5 ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
