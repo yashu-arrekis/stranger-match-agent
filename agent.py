@@ -159,3 +159,9 @@ result1 = new_observation(observation)
 
 data = reflect_on_result(result1)
 print(data)
+
+test_dict ={
+    "classification" : "UNKNOWN",
+    "decision" : "match found",
+    "action" : "notify user"
+}
