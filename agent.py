@@ -9,8 +9,8 @@ available_models = [model.name.removeprefix("models/") for model in client.model
 
 type_of_model = "gemini-3.6-flash"
 type_of_model1 = "gemini-3.1-flash-lite"
-type_of_model2 = "gemini-2.5-flash"
-type_of_model3 = "gemini-3.5-flash-lite"
+type_of_model2 = "gemini-3.5-flash-lite"
+type_of_model3 = "gemini-2.5-flash"
 type_of_model4 = "gemini-3.8-flash"
 type_of_model5 = "gemini-2.5-flash-lite"
 
@@ -115,6 +115,16 @@ def run_agent(observation):
 result = run_agent(observation)
 print(result)
 
+def reflect_on_result(result1):
+    if result1["classification"] == "FEMALE":
+        return "result acceptable."
+    elif result1["classification"] == "MALE":
+        return "result acceptable."
+    elif result1["classification"] == "UNKNOWN":
+        return "clarification needed."
+    else:
+        return result1["classification"]
+
 
 def new_observation(observation):
     attempts = 0
@@ -130,9 +140,12 @@ def new_observation(observation):
                 attempts +=1
             ref = reflect_on_result(upd_result)
             print(upd_result)
-            if ref["classification"] == "clarification needed":
+            if ref == "clarification needed.":
                 observation = input("Enter your observation: ")
-            continue
+                continue
+            else:
+                print(f"An unexpected reflection occured and reflection is {ref}")
+                break
         elif upd_result["action"] == "notify user":
             break
         elif upd_result["action"] == "skip stranger":
@@ -143,16 +156,6 @@ def new_observation(observation):
     return upd_result
 
 result1 = new_observation(observation)
-
-def reflect_on_result(result1):
-    if result1["classification"] == "FEMALE":
-        return "result acceptable."
-    elif result1["classification"] == "MALE":
-        return "result acceptable."
-    elif result1["classification"] == "UNKNOWN":
-        return "clarification needed."
-    else:
-        return result1["classification"]
 
 data = reflect_on_result(result1)
 print(data)
