@@ -116,15 +116,28 @@ result = run_agent(observation)
 print(result)
 
 def reflect_on_result(result1):
-    if result1["classification"] == "FEMALE":
-        return "result acceptable."
-    elif result1["classification"] == "MALE":
-        return "result acceptable."
-    elif result1["classification"] == "UNKNOWN":
-        return "clarification needed."
-    else:
-        return result1["classification"]
+    expected_results = {
+        "FEMALE": ("match found", "notify user"),
+        "MALE": ("skip", "skip stranger"),
+        "UNKNOWN": ("need more information", "ask for clarification")
+    }
 
+    classification = result1.get("classification")
+    decision = result1.get("decision")
+    action = result1.get("action")
+
+    if classification not in expected_results:
+        return "inconsistent result."
+
+    expected_decision, expected_action = expected_results[classification]
+
+    if decision != expected_decision or action != expected_action:
+        return "inconsistent result."
+
+    if classification == "UNKNOWN":
+        return "clarification needed."
+
+    return "result acceptable."
 
 def new_observation(observation):
     attempts = 0
@@ -159,34 +172,3 @@ result1 = new_observation(observation)
 
 data = reflect_on_result(result1)
 print(data)
-
-test_dict ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
-test_dict1 ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
-test_dict2 ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
-test_dict3 ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
-test_dict4 ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
-test_dict5 ={
-    "classification" : "UNKNOWN",
-    "decision" : "match found",
-    "action" : "notify user"
-}
