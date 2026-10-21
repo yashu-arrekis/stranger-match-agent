@@ -10,8 +10,8 @@ available_models = [model.name.removeprefix("models/") for model in client.model
 type_of_model = "gemini-3.6-flash"
 type_of_model1 = "gemini-3.1-flash-lite"
 type_of_model2 = "gemini-3.5-flash-lite"
-type_of_model3 = "gemini-2.5-flash"
-type_of_model4 = "gemini-3.8-flash"
+type_of_model3 = "gemini-3.8-flash"
+type_of_model4 = "gemini-2.5-flash"
 type_of_model5 = "gemini-2.5-flash-lite"
 
 models_to_try=[
