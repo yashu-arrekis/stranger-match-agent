@@ -29,7 +29,11 @@ for model in models_to_try:
 
 goal = "Determine whether the stranger is female"
 
+observations = []
+
 observation = input("Enter your observation: ")
+observations.append(observation)
+
 
 def reason_about_observation(observation):
     observation = observation.lower()
@@ -80,6 +84,7 @@ def reason_about_observation(observation):
         reasoning = "that the model returned an unsupported classification."
     return reasoning, classification
 
+
 def make_decision(classification):
     if classification == "FEMALE":
         decision = "match found"
@@ -112,8 +117,6 @@ def run_agent(observation):
         "decision" : decision,
         "action" : action
     }
-result = run_agent(observation)
-print(result)
 
 def reflect_on_result(result1):
     expected_results = {
@@ -147,9 +150,9 @@ def new_observation(observation):
         if reflect_on_result(upd_result) == "inconsistent result.":
             print("An inconsistent result is encountered.")
             sys.exit()
-            break
+
         if upd_result["action"] == "ask for clarification":
-            if attempts == 3:
+            if attempts == 2:
                 upd_result["action"] = "clarification limit reached."
                 print(upd_result)
                 break
@@ -159,20 +162,24 @@ def new_observation(observation):
             print(upd_result)
             if ref == "clarification needed.":
                 observation = input("Enter your observation: ")
+                observations.append(observation)
                 continue
             else:
                 print(f"An unexpected reflection occured and reflection is {ref}")
                 break
         elif upd_result["action"] == "notify user":
+            print(upd_result)
             break
         elif upd_result["action"] == "skip stranger":
+            print(upd_result)
             break
         else:
+            print(upd_result)
             print(f"{upd_result['action']} this is an unexpected action to prevent program crash has to break loop")
             break
     return upd_result
 
 result1 = new_observation(observation)
 
-data = reflect_on_result(result1)
-print(data)
+print(f"Reflection is {reflect_on_result(result1)}")
+print(observations)
