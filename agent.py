@@ -144,6 +144,10 @@ def new_observation(observation):
 
     while True:
         upd_result = run_agent(observation)
+        if reflect_on_result(upd_result) == "inconsistent result.":
+            print("An inconsistent result is encountered.")
+            sys.exit()
+            break
         if upd_result["action"] == "ask for clarification":
             if attempts == 3:
                 upd_result["action"] = "clarification limit reached."
