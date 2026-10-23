@@ -29,17 +29,20 @@ for model in models_to_try:
 
 goal = "Determine whether the stranger is female"
 
-observations = []
+with open("conversation_history.json", "r") as file:
+    observations = json.load(file)
 
 observation = input("Enter your observation: ")
 observations.append(observation)
 
 
-def reason_about_observation(observation):
+def reason_about_observation(observations,observation):
     observation = observation.lower()
     prompt = f"""
-    Analyze the observation and classify only what the speaker explicitly says about themselves.
+    Analyze the observation & observations than classify only what the speaker explicitly says about themselves.
+    convo_history: "{observations}"
     Profile: "{observation}"
+    only the last message is one to classify.
 
     Return a JSON object with exactly these two keys:
     - "classification": text value (e.g., 'FEMALE', 'MALE', or 'UNKNOWN') only in upper cases, 
@@ -107,8 +110,8 @@ def take_action(decision):
         action = "ask for clarification"
     return action
 
-def run_agent(observation):
-    reasoning, classification = reason_about_observation(observation)
+def run_agent(observations, observation):
+    reasoning, classification = reason_about_observation(observations, observation)
     decision = make_decision(classification)
     action = take_action(decision)
     return {
@@ -142,11 +145,11 @@ def reflect_on_result(result1):
 
     return "result acceptable."
 
-def new_observation(observation):
+def new_observation(observations,observation):
     attempts = 0
 
     while True:
-        upd_result = run_agent(observation)
+        upd_result = run_agent(observations,observation)
         if reflect_on_result(upd_result) == "inconsistent result.":
             print("An inconsistent result is encountered.")
             sys.exit()
@@ -179,7 +182,10 @@ def new_observation(observation):
             break
     return upd_result
 
-result1 = new_observation(observation)
+result1 = new_observation(observations, observation)
 
 print(f"Reflection is {reflect_on_result(result1)}")
 print(observations)
+
+with open("conversation_history.json", "w") as file:
+    json.dump(observations, file)
