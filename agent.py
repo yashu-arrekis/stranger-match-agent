@@ -29,18 +29,23 @@ for model in models_to_try:
 
 goal = "Determine whether the stranger is female"
 
-with open("conversation_history.json", "r") as file:
-    observations = json.load(file)
+try:
+    with open("conversation_history.json", "r") as file:
+        observations = json.load(file)
+except FileNotFoundError as f:
+    observations = []
+
+conversations = observations
+current_conversation = []
 
 observation = input("Enter your observation: ")
-observations.append(observation)
+current_conversation.append(observation)
 
-
-def reason_about_observation(observations,observation):
+def reason_about_observation(current_conversation,observation):
     observation = observation.lower()
     prompt = f"""
     Analyze the observation & observations than classify only what the speaker explicitly says about themselves.
-    convo_history: "{observations}"
+    current_conversaation_collection: "{current_conversation}"
     Profile: "{observation}"
     only the last message is one to classify.
 
@@ -110,8 +115,8 @@ def take_action(decision):
         action = "ask for clarification"
     return action
 
-def run_agent(observations, observation):
-    reasoning, classification = reason_about_observation(observations, observation)
+def run_agent(current_conversation, observation):
+    reasoning, classification = reason_about_observation(current_conversation, observation)
     decision = make_decision(classification)
     action = take_action(decision)
     return {
@@ -145,11 +150,11 @@ def reflect_on_result(result1):
 
     return "result acceptable."
 
-def new_observation(observations,observation):
+def new_observation(current_conversation,observation):
     attempts = 0
 
     while True:
-        upd_result = run_agent(observations,observation)
+        upd_result = run_agent(current_conversation,observation)
         if reflect_on_result(upd_result) == "inconsistent result.":
             print("An inconsistent result is encountered.")
             sys.exit()
@@ -165,7 +170,7 @@ def new_observation(observations,observation):
             print(upd_result)
             if ref == "clarification needed.":
                 observation = input("Enter your observation: ")
-                observations.append(observation)
+                current_conversation.append(observation)
                 continue
             else:
                 print(f"An unexpected reflection occured and reflection is {ref}")
@@ -182,10 +187,12 @@ def new_observation(observations,observation):
             break
     return upd_result
 
-result1 = new_observation(observations, observation)
+result1 = new_observation(current_conversation, observation)
 
 print(f"Reflection is {reflect_on_result(result1)}")
 print(observations)
+
+conversations.append(current_conversation)
 
 with open("conversation_history.json", "w") as file:
     json.dump(observations, file)
