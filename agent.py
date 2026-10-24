@@ -32,6 +32,10 @@ goal = "Determine whether the stranger is female"
 try:
     with open("conversation_history.json", "r") as file:
         observations = json.load(file)
+        if isinstance(observations, list):
+            pass
+        else:
+            print("still somehow it's not an prefect format")
 except FileNotFoundError as f:
     observations = []
 except json.JSONDecodeError as error:
