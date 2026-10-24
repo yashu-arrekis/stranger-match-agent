@@ -34,6 +34,9 @@ try:
         observations = json.load(file)
 except FileNotFoundError as f:
     observations = []
+except json.JSONDecodeError as error:
+    print("Encountered an invalid JSON format")
+    observations = []
 
 conversations = observations
 current_conversation = []
@@ -74,20 +77,23 @@ def reason_about_observation(current_conversation,observation):
                 print(f"Model {model_name} temporarily unavailable: {e}")
                 continue
             print(f"Non-retryable Gemini API error: {e}")
-            return "Gemini API request failed.", "UNKNOWN"
+            return "Gemini API request failed.", "REQUEST_FAILED"
     print(model_name)
     if response is None:
-        return "All gemini models failed.", "UNKNOWN"
+        return "All gemini models failed.", "UNREACHABLE"
     
     try:
         output_data = json.loads(response.text)
     except json.decoder.JSONDecodeError as e:
         print("encountered invalid json format")
-        return "Gemini returned invalid Json.", "UNKNOWN"
+        return "Gemini returned invalid Json.", "INVALID_FORMAT"
     
-    classification = output_data.get("classification", "UNKNOWN")
+    classification = output_data.get("classification", "UNREACHABLE")
     reasoning = output_data.get("reasoning", "reasoning is not provided.")
-    if classification not in {"FEMALE", "MALE", "UNKNOWN"}:
+    if classification == {"UNREACHABLE", "REQUEST_FAILED", "INVALID_FORMAT"}:
+        print(reasoning)
+        sys.exit()
+    if classification not in {"FEMALE", "MALE", "UNKNOWN", "UNREACHABLE"}:
         classification = "UNKNOWN"
         reasoning = "that the model returned an unsupported classification."
     return reasoning, classification
@@ -126,16 +132,16 @@ def run_agent(current_conversation, observation):
         "action" : action
     }
 
-def reflect_on_result(result1):
+def reflect_on_result(result):
     expected_results = {
         "FEMALE": ("match found", "notify user"),
         "MALE": ("skip", "skip stranger"),
         "UNKNOWN": ("need more information", "ask for clarification")
     }
 
-    classification = result1.get("classification")
-    decision = result1.get("decision")
-    action = result1.get("action")
+    classification = result.get("classification")
+    decision = result.get("decision")
+    action = result.get("action")
 
     if classification not in expected_results:
         return "inconsistent result."
@@ -187,12 +193,12 @@ def new_observation(current_conversation,observation):
             break
     return upd_result
 
-result1 = new_observation(current_conversation, observation)
+result = new_observation(current_conversation, observation)
 
-print(f"Reflection is {reflect_on_result(result1)}")
+print(f"Reflection is {reflect_on_result(result)}")
 print(observations)
 
 conversations.append(current_conversation)
 
 with open("conversation_history.json", "w") as file:
-    json.dump(observations, file)
+    json.dump(conversations, file, indent=2)
