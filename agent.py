@@ -32,10 +32,11 @@ goal = "Determine whether the stranger is female"
 try:
     with open("conversation_history.json", "r") as file:
         observations = json.load(file)
-        if isinstance(observations, list):
+        if isinstance(observations, list) and all(isinstance(item, list) for item in observations):
             pass
         else:
-            print("still somehow it's not an prefect format")
+            print("conversation history has an invalid structure so the agent is starting with an empty list")
+            observations = []
 except FileNotFoundError as f:
     observations = []
 except json.JSONDecodeError as error:
@@ -45,12 +46,23 @@ except json.JSONDecodeError as error:
 conversations = observations
 current_conversation = []
 
-observation = input("Enter your observation: ")
-current_conversation.append(observation)
+
+while True:
+    observation = input("Enter your observation: ").strip()
+
+    if not observation:
+        print("observation cant be empty or just spaces.")
+        print("again enter ur observation")
+        continue
+    else:
+        current_conversation.append(observation)
+        break
+
 
 def reason_about_observation(current_conversation,observation):
     observation = observation.lower()
     prompt = f"""
+    our goal is to {goal}
     Analyze the observation & observations than classify only what the speaker explicitly says about themselves.
     current_conversaation_collection: "{current_conversation}"
     Profile: "{observation}"
@@ -94,7 +106,7 @@ def reason_about_observation(current_conversation,observation):
     
     classification = output_data.get("classification", "UNREACHABLE")
     reasoning = output_data.get("reasoning", "reasoning is not provided.")
-    if classification == {"UNREACHABLE", "REQUEST_FAILED", "INVALID_FORMAT"}:
+    if classification in {"UNREACHABLE", "REQUEST_FAILED", "INVALID_FORMAT"}:
         print(reasoning)
         sys.exit()
     if classification not in {"FEMALE", "MALE", "UNKNOWN", "UNREACHABLE"}:
