@@ -191,8 +191,14 @@ def new_observation(current_conversation,observation):
             ref = reflect_on_result(upd_result)
             print(upd_result)
             if ref == "clarification needed.":
-                observation = input("Enter your observation: ")
-                current_conversation.append(observation)
+                while True:
+                    if not observation:
+                            print("observation cant be empty or just spaces.")
+                            print("again enter ur observation")
+                            continue
+                    else:
+                        current_conversation.append(observation)
+                        break
                 continue
             else:
                 print(f"An unexpected reflection occured and reflection is {ref}")
