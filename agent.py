@@ -48,7 +48,11 @@ current_conversation = []
 
 
 while True:
-    observation = input("Enter your observation: ").strip()
+    try:
+        observation = input("Enter your observation: ").strip()
+    except EOFError as e:
+        print(f"Encountered an error is {e}")
+        sys.exit()
 
     if not observation:
         print("observation cant be empty or just spaces.")
@@ -57,6 +61,23 @@ while True:
     else:
         current_conversation.append(observation)
         break
+
+def input_handling():
+    while True:
+        try:
+            observation = input("Enter your observation: ").strip()
+        except EOFError as e:
+            print(f"Encountered an error is {e}")
+            sys.exit()
+
+        if not observation:
+            print("observation cant be empty or just spaces.")
+            print("again enter ur observation")
+            continue
+        else:
+            current_conversation.append(observation)
+            break
+    return observation
 
 
 def reason_about_observation(current_conversation,observation):
