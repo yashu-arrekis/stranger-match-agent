@@ -46,22 +46,6 @@ except json.JSONDecodeError as error:
 conversations = observations
 current_conversation = []
 
-
-while True:
-    try:
-        observation = input("Enter your observation: ").strip()
-    except EOFError as e:
-        print(f"Encountered an error is {e}")
-        sys.exit()
-
-    if not observation:
-        print("observation cant be empty or just spaces.")
-        print("again enter ur observation")
-        continue
-    else:
-        current_conversation.append(observation)
-        break
-
 def input_handling():
     while True:
         try:
@@ -75,10 +59,12 @@ def input_handling():
             print("again enter ur observation")
             continue
         else:
-            current_conversation.append(observation)
             break
+
     return observation
 
+observation = input_handling()
+current_conversation.append(observation)
 
 def reason_about_observation(current_conversation,observation):
     observation = observation.lower()
@@ -224,14 +210,8 @@ def new_observation(current_conversation,observation):
             ref = reflect_on_result(upd_result)
             print(upd_result)
             if ref == "clarification needed.":
-                while True:
-                    if not observation:
-                            print("observation cant be empty or just spaces.")
-                            print("again enter ur observation")
-                            continue
-                    else:
-                        current_conversation.append(observation)
-                        break
+                observation = input_handling()
+                current_conversation.append(observation)
                 continue
             else:
                 print(f"An unexpected reflection occured and reflection is {ref}")
