@@ -112,12 +112,18 @@ def reason_about_observation(current_conversation,observation):
     if classification not in {"FEMALE", "MALE", "UNKNOWN", "UNREACHABLE"}:
         classification = "UNKNOWN"
         reasoning = "that the model returned an unsupported classification."
+    
     if reasoning is None:
         reasoning = "the reasoning is none to prevent further crashes passing this manual reasoning so please try again."
-    elif not reasoning.strip():
+    elif isinstance(reasoning, str):
+        pass
+    else:
+        print("Encountered a integer in python")
+        reasoning = "Due to encountered an invalid reasoning. this is a manual reasoning"
+    if not reasoning.strip():
         print("reasoning cant be empty or just spaces.")
         reasoning = "Encountered an empty or just spaces in reasoning, so please try again."
-   
+
     return reasoning, classification
 
 
