@@ -63,9 +63,6 @@ def input_handling():
 
     return observation
 
-observation = input_handling()
-current_conversation.append(observation)
-
 def reason_about_observation(current_conversation,observation):
     observation = observation.lower()
     prompt = f"""
@@ -228,12 +225,17 @@ def new_observation(current_conversation,observation):
             break
     return upd_result
 
-result = new_observation(current_conversation, observation)
+try:
+    observation = input_handling()
+    current_conversation.append(observation)
 
-print(f"Reflection is {reflect_on_result(result)}")
-print(observations)
+    result = new_observation(current_conversation, observation)
 
-conversations.append(current_conversation)
+    print(f"Reflection is {reflect_on_result(result)}")
 
-with open("conversation_history.json", "w") as file:
-    json.dump(conversations, file, indent=2)
+finally:
+    conversations.append(current_conversation)
+
+    with open("conversation_history.json", "w") as file:
+        json.dump(conversations, file, indent=2)
+
